@@ -24,13 +24,13 @@
   <section class="hero">
     <div class="hero-copy">
       <div class="eyebrow">Your private collection</div>
-      <h2>Find the moment. Play it in Telegram.</h2>
-      <p>Visual previews make your family videos easy to recognize without opening each one.</p>
+      <h2>Find the video. Play it in Telegram.</h2>
+      <p>Search by title or hashtag and jump straight to the message.</p>
     </div>
   </section>
 
   <div class="controls">
-    <input type="search" id="searchBox" placeholder="Search titles or tags (e.g. #vacation, birthday)" aria-label="Search videos" autocomplete="off">
+    <input type="search" id="searchBox" placeholder="Search titles or tags (e.g. #vacation)" aria-label="Search videos" autocomplete="off">
     <select id="sortSel" aria-label="Sort videos">
       <option value="new">Newest</option>
       <option value="old">Oldest</option>
@@ -40,10 +40,11 @@
 
   <div id="tagFilters" class="filters" role="group" aria-label="Filter by tag"></div>
   <div class="filter-status" id="filterStatus" hidden>
-    <div id="selectedTags" class="selected-tags" aria-live="polite"></div>
-    <span id="filterCount" aria-live="polite"></span>
-    <button id="clearFilters" class="clear-filters" type="button" hidden>Clear</button>
+    <div id="selectedTags" class="selected-tags"></div>
+    <span id="filterCount"></span>
+    <button id="clearFilters" class="clear-filters" type="button">Clear</button>
   </div>
+
   <div class="section-title">
     <h2 id="libraryHeading">Recently Added</h2>
     <span id="librarySubheading"></span>
@@ -51,12 +52,6 @@
   <section id="videoList" class="list" aria-live="polite"></section>
 
   <button id="addBtn" class="fab" type="button" aria-label="Add video" title="Add video">+</button>
-
-  <nav class="bottom-nav" aria-label="Primary navigation">
-    <button class="nav-item active" type="button"><span class="nav-icon">⌂</span>Now Movie Store</button>
-    <button class="nav-item" type="button" data-nav="favorites"><span class="nav-icon">♡</span>Favorites</button>
-    <button class="nav-item" type="button" data-nav="settings"><span class="nav-icon">⚙</span>Settings</button>
-  </nav>
 </main>
 
 <!-- Add / edit -->
@@ -75,19 +70,6 @@
       <label for="newTags">Hashtags</label>
       <input type="text" id="newTags" maxlength="300" autocapitalize="none" autocomplete="off" placeholder="#vacation #family #2024">
     </div>
-    <div class="upload-box">
-      <label for="thumbnailUrl">Thumbnail image URL</label>
-      <input type="url" id="thumbnailUrl" maxlength="500" inputmode="url" autocapitalize="none" autocomplete="off" spellcheck="false" placeholder="https://example.com/preview.jpg">
-      <div class="muted small" style="margin-top:.35rem">
-        Paste a direct link to a preview image (jpg/png/webp). Or upload a file below.
-      </div>
-      <label for="thumbnailInput" style="margin-top:.65rem">Or upload an image</label>
-      <input type="file" id="thumbnailInput" accept="image/jpeg,image/png,image/webp,image/*">
-      <div id="thumbnailPreview" class="preview">
-        <img id="thumbnailPreviewImg" alt="Thumbnail preview">
-        <button id="removeThumbnailBtn" class="preview-remove" type="button" aria-label="Remove thumbnail">×</button>
-      </div>
-    </div>
     <p id="formError" class="msg err" role="alert"></p>
     <div class="row">
       <button id="cancelBtn" class="btn ghost" type="button">Cancel</button>
@@ -104,70 +86,41 @@
     <div class="tabs" role="tablist">
       <button class="tab on" type="button" role="tab" data-tab="export" aria-selected="true">Export</button>
       <button class="tab" type="button" role="tab" data-tab="import" aria-selected="false">Import</button>
-      <button class="tab" type="button" role="tab" data-tab="html" aria-selected="false">Telegram HTML</button>
     </div>
 
-    <!-- EXPORT -->
     <div class="tabpane" data-pane="export">
       <p class="muted small">Save a copy of your library. Pick a format:</p>
       <div class="radio-row">
-        <label><input type="radio" name="expFmt" value="full" checked> Full JSON <span class="muted small">(includes thumbnails)</span></label>
-        <label><input type="radio" name="expFmt" value="lean"> Compact JSON <span class="muted small">(no thumbnails)</span></label>
-        <label><input type="radio" name="expFmt" value="list"> Plain list <span class="muted small">(url + title)</span></label>
+        <label><input type="radio" name="expFmt" value="json" checked> JSON <span class="muted small">(everything, best for restore)</span></label>
+        <label><input type="radio" name="expFmt" value="list"> Plain list <span class="muted small">(link + title)</span></label>
       </div>
       <textarea id="exportText" spellcheck="false" readonly aria-label="Exported data"></textarea>
       <p class="muted small" id="exportStats"></p>
       <div class="row">
-        <button id="copyExportBtn" class="btn ghost" type="button">Copy</button>
-        <button id="downloadExportBtn" class="btn primary" type="button">Download .json</button>
+        <button id="copyExportBtn" class="btn primary" type="button">Copy</button>
+        <button id="downloadExportBtn" class="btn ghost" type="button">Download</button>
       </div>
     </div>
 
-    <!-- IMPORT -->
     <div class="tabpane" data-pane="import" hidden>
       <p class="muted small">
-        Paste a backup JSON (from <em>Export</em>) or a plain list like:
+        Paste the <code>vault.json</code> from your Telegram script, an exported backup, or a plain list like:
       </p>
       <pre class="muted small fmt-hint">https://t.me/c/1234567890/42
 Family picnic highlights
 
 https://t.me/c/1234567890/57
 Birthday party compilation</pre>
-
-      <div class="upload-box" style="margin-top:.5rem; padding:.75rem;">
-        <label for="importFile" style="margin-bottom:.5rem; display:block;">Choose a backup file (.json or .txt)</label>
-        <input type="file" id="importFile" accept=".json,.txt,application/json,text/plain" style="font-size:12px; border:0; padding:0; background:transparent;">
+      <div>
+        <label for="importFile">Or choose a file (.json or .txt)</label>
+        <input type="file" id="importFile" accept=".json,.txt,application/json,text/plain">
       </div>
-
-      <label style="display:flex; align-items:center; gap:.5rem; margin-top:.5rem; cursor:pointer;">
-        <input type="checkbox" id="overwriteToggle">
-        <span class="muted small" style="margin:0;">Overwrite entire library with this file</span>
-      </label>
-
-      <textarea id="importText" spellcheck="false" aria-label="Import data" placeholder="Paste backup JSON or a url + title list…"></textarea>
+      <textarea id="importText" spellcheck="false" aria-label="Import data" placeholder="Paste JSON or a link + title list here…"></textarea>
+      <label class="check"><input type="checkbox" id="overwriteToggle"> Replace the whole library instead of merging</label>
       <p class="muted small" id="importPreview"></p>
       <div class="row">
         <button id="previewImportBtn" class="btn ghost" type="button">Preview</button>
         <button id="runImportBtn" class="btn primary" type="button" disabled>Import</button>
-      </div>
-    </div>
-
-    <!-- TELEGRAM HTML -->
-    <div class="tabpane" data-pane="html" hidden>
-      <p class="muted small">
-        Paste the contents of a Telegram Desktop export (<code>messages.html</code>).
-        Captions become titles; auto-tags are generated from each caption.
-      </p>
-      <div>
-        <label for="htmlChannel">Channel ID</label>
-        <input type="text" id="htmlChannel" inputmode="numeric" placeholder="e.g. 1234567890" autocomplete="off">
-        <p class="muted small" id="htmlChannelHint"></p>
-      </div>
-      <textarea id="htmlText" spellcheck="false" aria-label="Telegram HTML export" placeholder="Paste messages.html contents here…"></textarea>
-      <p class="muted small" id="htmlPreview"></p>
-      <div class="row">
-        <button id="previewHtmlBtn" class="btn ghost" type="button">Preview</button>
-        <button id="runHtmlBtn" class="btn primary" type="button" disabled>Import</button>
       </div>
     </div>
 
@@ -177,7 +130,7 @@ Birthday party compilation</pre>
   </div>
 </div>
 
-<div id="toast" class="toast" role="status" aria-live="polite" hidden></div>
+<div id="toast" class="toast" role="status" aria-live="polite"></div>
 
 <script>
 (() => {
@@ -187,19 +140,18 @@ Birthday party compilation</pre>
   const tg = window.Telegram && window.Telegram.WebApp;
   const has = v => { try { return !!tg && tg.isVersionAtLeast(v); } catch { return false; } };
   const $ = id => document.getElementById(id);
+  try { tg.ready(); tg.expand(); } catch {}
 
-  // *** CHANGED FOR CHANNEL 2 ***
+  // Storage keys (kept separate from other apps on the same GitHub Pages site)
   const LS_KEY = 'channel2_videos';
   const LS_PREFS = 'channel2_prefs';
   const LS_DIRTY = 'channel2_dirty';
   const CS_PREFIX = 'v2_';
-  
   const CS_MAX = 1000;
   const TITLE_MAX = 120, TAGS_MAX = 15, TAG_MAX = 30;
 
   const cloudApi = has('6.9') && tg.CloudStorage ? tg.CloudStorage : null;
   let cloud = cloudApi;
-
   const cs = (method, ...args) => new Promise((resolve, reject) => {
     cloud[method](...args, (err, result) => err ? reject(new Error(String(err))) : resolve(result));
   });
@@ -220,6 +172,14 @@ Birthday party compilation</pre>
   function openLink(url) {
     if (has('6.1') && /^https:\/\/(t\.me|telegram\.(me|dog))\//i.test(url)) tg.openTelegramLink(url);
     else window.open(url, '_blank', 'noopener');
+  }
+  let toastTimer = 0;
+  function toast(msg) {
+    const t = $('toast');
+    t.textContent = msg;
+    t.classList.add('show');
+    clearTimeout(toastTimer);
+    toastTimer = setTimeout(() => t.classList.remove('show'), 2200);
   }
 
   // ---------- Data helpers ----------
@@ -250,14 +210,14 @@ Birthday party compilation</pre>
   }
 
   function autoTags(title) {
-    const stop = new Set(['the','a','an','and','or','of','to','in','on','for','with','your','you','my','is','it','at','by','from','this','that','into','over','under','out','up','as','be','are','was','were','has','have','had','not','no','but','so','if','than','then','too','very','just','only','also','can','will','do','did','does','about','after','before','between','through','during','without','within','along','across','behind','beyond','plus','vs','part','parts','episode','ep','video','full','hd','720p','1080p','4k']);
-    const words = String(title || '').toLowerCase()
-      .replace(/[^\p{L}\p{N}\s]/gu, ' ').split(/\s+/)
-      .filter(w => w.length >= 3 && !stop.has(w) && !/^\d+$/.test(w));
-    const seen = new Set(); const tags = [];
-    for (const w of words) { if (seen.has(w)) continue; seen.add(w); tags.push('#' + w); if (tags.length >= 6) break; }
-    if (!tags.length) tags.push('#video');
-    return tags;
+    const stop = new Set(['the','and','for','with','your','you','this','that','from','into','are','was','were','has','have','had','not','but','than','then','too','very','just','only','also','can','will','did','does','about','after','before','part','episode','video','full','720p','1080p']);
+    const seen = new Set(), tags = [];
+    for (const w of String(title || '').toLowerCase().replace(/[^\p{L}\p{N}\s]/gu, ' ').split(/\s+/)) {
+      if (w.length < 3 || stop.has(w) || /^\d+$/.test(w) || seen.has(w)) continue;
+      seen.add(w); tags.push('#' + w);
+      if (tags.length >= 6) break;
+    }
+    return tags.length ? tags : ['#video'];
   }
 
   function normalizeEntry(o) {
@@ -267,13 +227,9 @@ Birthday party compilation</pre>
     if (!url || !title) return null;
     const id = String(o.id == null ? '' : o.id).replace(/[^A-Za-z0-9_-]/g, '').slice(0, 40) || newId();
     const tags = parseTags(Array.isArray(o.tags) ? o.tags.join(' ') : '');
-    const thumbnail = typeof o.thumbnail === 'string' &&
-      (/^data:image\/(jpeg|jpg|png|webp);base64,/i.test(o.thumbnail) ||
-       /^https?:\/\//i.test(o.thumbnail))
-      ? o.thumbnail.slice(0, 220000) : '';
     const date = typeof o.date === 'string' && /^\d{4}-\d{2}-\d{2}$/.test(o.date) ? o.date : today();
     const created = Number.isFinite(o.created) ? o.created : (Date.parse(date) || Date.now());
-    return { id, title, url, tags: tags.length ? tags : ['#family'], date, created, thumbnail };
+    return { id, title, url, tags: tags.length ? tags : ['#video'], date, created };
   }
 
   function dedupe(list) {
@@ -293,11 +249,8 @@ Birthday party compilation</pre>
       state.query = typeof raw.query === 'string' ? raw.query : '';
     } catch {}
   }
-
   function savePrefs() {
-    try {
-      localStorage.setItem(LS_PREFS, JSON.stringify({ tags: [...state.tags], sort: state.sort, query: state.query }));
-    } catch {}
+    try { localStorage.setItem(LS_PREFS, JSON.stringify({ tags: state.tags, sort: state.sort, query: state.query })); } catch {}
   }
 
   function readMirror() {
@@ -332,9 +285,7 @@ Birthday party compilation</pre>
         state.mode = 'cloud';
       } catch (e) {
         console.warn('Cloud storage unavailable', e);
-        cloud = null;
-        state.mode = 'degraded';
-        items = null;
+        cloud = null; state.mode = 'degraded'; items = null;
       }
     } else {
       state.mode = 'local';
@@ -364,7 +315,7 @@ Birthday party compilation</pre>
 
   async function commitSave(entry) {
     const exists = state.videos.some(v => v.id === entry.id);
-    if (!exists && cloud && state.videos.length >= CS_MAX) throw new Error('limit');
+    if (!exists && state.videos.length >= CS_MAX) throw new Error('limit');
     const next = exists ? state.videos.map(v => v.id === entry.id ? entry : v) : [entry, ...state.videos];
     if (cloud) await cs('setItem', CS_PREFIX + entry.id, JSON.stringify(entry));
     if (!mirror(next) && !cloud) throw new Error('local-write-failed');
@@ -392,7 +343,7 @@ Birthday party compilation</pre>
   function visible() {
     const q = state.query.trim().toLowerCase();
     const list = state.videos.filter(v =>
-      (state.tags.length === 0 || state.tags.every(tag => v.tags.includes(tag))) &&
+      (state.tags.length === 0 || state.tags.every(t => v.tags.includes(t))) &&
       (!q || v.title.toLowerCase().includes(q) || v.tags.some(t => t.includes(q))));
     const sorters = {
       new: (a, b) => b.created - a.created,
@@ -403,89 +354,63 @@ Birthday party compilation</pre>
   }
 
   function card(v) {
-    const thumb = v.thumbnail
-      ? el('img', { class: 'thumb', src: v.thumbnail, alt: 'Preview for ' + v.title, loading: 'lazy' })
-      : el('div', { class: 'thumb-placeholder', 'aria-label': 'No thumbnail available', text: '▶' });
-
-    const thumbWrap = el('div', {
-      class: 'thumb-wrap',
-      'data-action': 'open',
-      'data-id': v.id,
-      role: 'button',
-      tabindex: '0',
-      'aria-label': 'Play ' + v.title
-    }, [
-      thumb,
-      el('span', { class: 'play-overlay', 'aria-hidden': 'true', text: '▶' })
-    ]);
-
     return el('article', { class: 'card' }, [
-      thumbWrap,
-      el('div', { class: 'card-body' }, [
-        el('div', { class: 'card-top' }, [
-          el('span', { class: 'date', text: v.date }),
-          el('div', { class: 'card-actions' }, [
-            el('button', { class: 'icon', type: 'button', 'data-action': 'edit', 'data-id': v.id, 'aria-label': 'Edit ' + v.title, title: 'Edit', text: '✎' }),
-            el('button', { class: 'icon danger', type: 'button', 'data-action': 'delete', 'data-id': v.id, 'aria-label': 'Delete ' + v.title, title: 'Delete', text: '✕' })
-          ])
-        ]),
-        el('h3', { text: v.title }),
-        el('div', { class: 'tags' }, v.tags.map(t => el('button', {
-          class: 'tag' + (state.tags.includes(t) ? ' on' : ''), type: 'button', 'data-tag': t,
-          'aria-pressed': String(state.tags.includes(t)), text: t
-        }))),
-        el('a', { class: 'play', href: v.url, rel: 'noopener noreferrer', 'data-action': 'open', 'data-id': v.id, text: '▶ Play in Telegram' })
-      ])
+      el('div', { class: 'card-top' }, [
+        el('span', { class: 'date', text: v.date }),
+        el('div', { class: 'card-actions' }, [
+          el('button', { class: 'icon', type: 'button', 'data-action': 'edit', 'data-id': v.id, 'aria-label': 'Edit ' + v.title, title: 'Edit', text: '✎' }),
+          el('button', { class: 'icon danger', type: 'button', 'data-action': 'delete', 'data-id': v.id, 'aria-label': 'Delete ' + v.title, title: 'Delete', text: '✕' })
+        ])
+      ]),
+      el('h3', { text: v.title }),
+      el('div', { class: 'tags' }, v.tags.map(t => el('button', {
+        class: 'tag' + (state.tags.includes(t) ? ' on' : ''), type: 'button', 'data-tag': t,
+        'aria-pressed': String(state.tags.includes(t)), text: t
+      }))),
+      el('a', { class: 'play', href: v.url, rel: 'noopener noreferrer', 'data-action': 'open', 'data-id': v.id, text: '▶ Play in Telegram' })
     ]);
   }
 
   function render() {
     const total = state.videos.length;
     const allTags = [...new Set(state.videos.flatMap(v => v.tags))].sort((a, b) => a.localeCompare(b));
-
-    if (!state.loading) {
-      state.tags = state.tags.filter(t => allTags.includes(t));
-    }
-
+    if (!state.loading) state.tags = state.tags.filter(t => allTags.includes(t));
     const list = state.loading ? [] : visible();
+    const filtered = !!state.query.trim() || state.tags.length > 0;
 
     $('counter').textContent = state.loading ? 'Loading catalog...'
       : list.length === total ? `${total} ${total === 1 ? 'video' : 'videos'}`
       : `${list.length} of ${total} videos`;
-    $('libraryHeading').textContent = state.query.trim() || state.tags.length ? 'Search results' : 'Recently Added';
+    $('libraryHeading').textContent = filtered ? 'Search results' : 'Recently Added';
     $('librarySubheading').textContent = list.length ? `${list.length} ${list.length === 1 ? 'title' : 'titles'}` : '';
     $('storageNote').textContent = state.loading ? ''
       : state.mode === 'cloud' ? 'Synced across your Telegram devices.'
       : state.mode === 'degraded' ? 'Cloud sync unavailable. Changes are saved on this device and will sync later.'
       : 'Saved on this device only.';
-    if (state.videos.some(v => v.thumbnail)) {
-      $('storageNote').textContent += ' Preview images are stored on this device and included in JSON backups.';
-    }
 
     $('tagFilters').replaceChildren(...['All', ...allTags].map(t => {
       const active = t === 'All' ? state.tags.length === 0 : state.tags.includes(t);
       return el('button', { class: 'chip' + (active ? ' on' : ''), type: 'button', 'data-tag': t, 'aria-pressed': String(active), text: t });
     }));
 
-    const status = $('filterStatus');
-    const selected = $('selectedTags');
-    status.hidden = state.tags.length === 0;
-    selected.replaceChildren(...state.tags.map(t => el('button', {
-      class: 'selected-tag', type: 'button', 'data-tag': t, 'aria-label': 'Remove filter ' + t,
-      title: 'Remove ' + t
-    }, [el('span', { text: t }), el('span', { class: 'remove', 'aria-hidden': 'true', text: '×' })])));
-    $('filterCount').textContent = state.tags.length ? `${state.tags.length} filter${state.tags.length === 1 ? '' : 's'} selected` : '';
-    $('clearFilters').hidden = state.tags.length === 0;
+    $('filterStatus').hidden = state.tags.length === 0;
+    $('selectedTags').replaceChildren(...state.tags.map(t => el('button', {
+      class: 'selected-tag', type: 'button', 'data-tag': t, 'aria-label': 'Remove filter ' + t, title: 'Remove ' + t
+    }, [el('span', { text: t }), el('span', { class: 'remove', 'aria-hidden': 'true', text: ' ×' })])));
+    $('filterCount').textContent = state.tags.length ? `${state.tags.length} selected` : '';
 
     const box = $('videoList');
-    if (state.loading) { box.replaceChildren(); return; }
-    if (total === 0) {
-      box.replaceChildren(el('div', { class: 'empty', text: 'No videos yet. Tap "+" to save your first Telegram video and its preview image.' }));
-    } else if (list.length === 0) {
-      box.replaceChildren(el('div', { class: 'empty', text: 'No videos match. Clear the search or choose All.' }));
-    } else {
-      box.replaceChildren(...list.map(card));
-    }
+    if (state.loading) box.replaceChildren();
+    else if (total === 0) box.replaceChildren(el('div', { class: 'empty', text: 'No videos yet. Tap "+" to add your first Telegram video link.' }));
+    else if (list.length === 0) box.replaceChildren(el('div', { class: 'empty', text: 'No videos match. Clear the search or choose All.' }));
+    else box.replaceChildren(...list.map(card));
+  }
+
+  function toggleTag(t) {
+    if (t === 'All') state.tags = [];
+    else if (state.tags.includes(t)) state.tags = state.tags.filter(x => x !== t);
+    else state.tags = [...state.tags, t];
+    savePrefs(); render();
   }
 
   // ---------- Modals ----------
@@ -500,91 +425,20 @@ Birthday party compilation</pre>
   function closeModal() {
     if (!activeModal) return;
     $(activeModal).hidden = true;
-    activeModal = null;
-    editingId = null;
+    activeModal = null; editingId = null;
     try { if (has('6.1')) tg.BackButton.hide(); } catch {}
-  }
-
-  let pendingThumbnail = '';
-
-  function setThumbnailPreview(src) {
-    pendingThumbnail = src || '';
-    const wrap = $('thumbnailPreview');
-    const img = $('thumbnailPreviewImg');
-    if (pendingThumbnail) {
-      img.src = pendingThumbnail;
-      wrap.classList.add('show');
-    } else {
-      img.removeAttribute('src');
-      wrap.classList.remove('show');
-    }
   }
 
   function openForm(v) {
     editingId = v ? v.id : null;
-    $('formTitle').textContent = v ? 'Edit video' : 'Add video link';
+    $('formTitle').textContent = v ? 'Edit video' : 'Add video';
     $('saveBtn').textContent = v ? 'Save changes' : 'Add video';
     $('newTitle').value = v ? v.title : '';
     $('newUrl').value = v ? v.url : '';
     $('newTags').value = v ? v.tags.join(' ') : '';
-    $('thumbnailInput').value = '';
-    const thumb = v && v.thumbnail ? v.thumbnail : '';
-    if (thumb && /^https?:\/\//i.test(thumb)) {
-      $('thumbnailUrl').value = thumb;
-    } else {
-      $('thumbnailUrl').value = '';
-    }
-    setThumbnailPreview(thumb);
     $('formError').textContent = '';
     showModal('formModal');
     $('newTitle').focus();
-  }
-
-  function applyThumbnailUrl() {
-    const raw = ($('thumbnailUrl').value || '').trim();
-    if (!raw) return;
-    try {
-      const u = new URL(raw);
-      if (!/^https?:$/i.test(u.protocol)) return;
-      setThumbnailPreview(u.href);
-      $('thumbnailInput').value = '';
-    } catch {}
-  }
-
-  function compressThumbnail(file) {
-    return new Promise((resolve, reject) => {
-      if (!file || !file.type.startsWith('image/')) return reject(new Error('Please choose an image.'));
-      const reader = new FileReader();
-      reader.onerror = () => reject(new Error('Could not read the image.'));
-      reader.onload = () => {
-        const img = new Image();
-        img.onload = () => {
-          const maxW = 640;
-          const scale = Math.min(1, maxW / img.width);
-          const w = Math.max(1, Math.round(img.width * scale));
-          const h = Math.max(1, Math.round(img.height * scale));
-          const canvas = document.createElement('canvas');
-          canvas.width = w; canvas.height = h;
-          const ctx = canvas.getContext('2d');
-          ctx.drawImage(img, 0, 0, w, h);
-          const out = canvas.toDataURL('image/jpeg', 0.72);
-          if (out.length > 220000) {
-            const smaller = document.createElement('canvas');
-            const s = .72;
-            smaller.width = Math.max(1, Math.round(w * s));
-            smaller.height = Math.max(1, Math.round(h * s));
-            const sctx = smaller.getContext('2d');
-            sctx.drawImage(canvas, 0, 0, smaller.width, smaller.height);
-            resolve(smaller.toDataURL('image/jpeg', 0.65));
-          } else {
-            resolve(out);
-          }
-        };
-        img.onerror = () => reject(new Error('The selected image could not be decoded.'));
-        img.src = reader.result;
-      };
-      reader.readAsDataURL(file);
-    });
   }
 
   async function saveForm() {
@@ -599,40 +453,23 @@ Birthday party compilation</pre>
 
     const old = editingId ? state.videos.find(v => v.id === editingId) : null;
     const tags = parseTags($('newTags').value);
-
-    let thumb = '';
-    const urlRaw = ($('thumbnailUrl').value || '').trim();
-    if (urlRaw) {
-      try {
-        const u = new URL(urlRaw);
-        if (/^https?:$/i.test(u.protocol)) thumb = u.href;
-      } catch {}
-    }
-    if (!thumb) thumb = pendingThumbnail || (old ? old.thumbnail || '' : '');
-
     const entry = {
       id: old ? old.id : newId(),
       title: title.slice(0, TITLE_MAX),
       url,
-      tags: tags.length ? tags : ['#family'],
+      tags: tags.length ? tags : autoTags(title),
       date: old ? old.date : today(),
-      created: old ? old.created : Date.now(),
-      thumbnail: thumb
+      created: old ? old.created : Date.now()
     };
 
     saving = true;
     $('saveBtn').disabled = true;
     try {
       await commitSave(entry);
-      closeModal();
-      render();
-      haptic('success');
+      closeModal(); render(); haptic('success');
     } catch (e) {
-      fail(e.message === 'limit'
-        ? 'The catalog is full (1000 videos). Remove some to add more.'
-        : e.name === 'QuotaExceededError' || /quota|storage/i.test(String(e.message || ''))
-          ? 'Storage is full. Use smaller preview images or remove some thumbnails.'
-          : 'Could not save. Check your connection and try again.');
+      fail(e.message === 'limit' ? 'The catalog is full (1000 videos). Remove some to add more.'
+        : 'Could not save. Check your connection and try again.');
     } finally {
       saving = false;
       $('saveBtn').disabled = false;
@@ -649,14 +486,13 @@ Birthday party compilation</pre>
 
   // ---------- Backup / Restore ----------
   let pendingImport = null;
-  let pendingHtml = null;
 
   const backupMsg = (text, kind) => {
     const m = $('backupMsg');
     m.textContent = text || '';
     m.className = 'msg' + (kind === 'err' ? ' err' : kind === 'ok' ? ' ok' : '');
   };
-  const setProgress = (pct) => {
+  const setProgress = pct => {
     const wrap = $('backupProgress');
     if (pct == null) { wrap.hidden = true; $('backupProgressBar').style.width = '0'; return; }
     wrap.hidden = false;
@@ -669,15 +505,172 @@ Birthday party compilation</pre>
       t.classList.toggle('on', on);
       t.setAttribute('aria-selected', String(on));
     });
-    document.querySelectorAll('.tabpane').forEach(p => {
-      p.hidden = p.dataset.pane !== name;
-    });
-    backupMsg('');
-    setProgress(null);
+    document.querySelectorAll('.tabpane').forEach(p => { p.hidden = p.dataset.pane !== name; });
+    backupMsg(''); setProgress(null);
     if (name === 'export') refreshExport();
-    if (name === 'html') refreshHtmlChannelHint();
   }
 
-  // ---- Export ----
+  // Export
+  const exportFmt = () => document.querySelector('input[name="expFmt"]:checked').value;
   function buildExport(format) {
-    if (format
+    if (format === 'list') return state.videos.map(v => v.url + '\n' + v.title).join('\n\n');
+    return JSON.stringify({ app: 'now-movie-store', version: 1, exported: today(), videos: state.videos }, null, 2);
+  }
+  function refreshExport() {
+    $('exportText').value = buildExport(exportFmt());
+    $('exportStats').textContent = `${state.videos.length} ${state.videos.length === 1 ? 'video' : 'videos'}`;
+  }
+  async function copyExport() {
+    const text = $('exportText').value;
+    try { await navigator.clipboard.writeText(text); }
+    catch { $('exportText').select(); document.execCommand('copy'); }
+    backupMsg('Copied to clipboard.', 'ok');
+  }
+  function downloadExport() {
+    const isList = exportFmt() === 'list';
+    const blob = new Blob([$('exportText').value], { type: isList ? 'text/plain' : 'application/json' });
+    const a = document.createElement('a');
+    a.href = URL.createObjectURL(blob);
+    a.download = `now-movie-store-${today()}.${isList ? 'txt' : 'json'}`;
+    document.body.append(a); a.click(); a.remove();
+    setTimeout(() => URL.revokeObjectURL(a.href), 4000);
+    backupMsg('If nothing downloaded, use Copy instead (some Telegram apps block downloads).', '');
+  }
+
+  // Import
+  function parseImport(text) {
+    text = String(text || '').trim();
+    if (!text) return { items: [], bad: 0 };
+    let raw = null;
+    try {
+      const j = JSON.parse(text);
+      raw = Array.isArray(j) ? j : (j && Array.isArray(j.videos) ? j.videos : null);
+    } catch {}
+    if (!raw) {
+      raw = text.split(/\n\s*\n/).map(block => {
+        const lines = block.split('\n').map(s => s.trim()).filter(Boolean);
+        const title = lines.slice(1).join(' ');
+        return { url: lines[0], title, tags: autoTags(title) };
+      });
+    }
+    const items = raw.map(normalizeEntry).filter(Boolean);
+    return { items: dedupe(items), bad: raw.length - items.length };
+  }
+
+  function previewImport() {
+    pendingImport = null;
+    $('runImportBtn').disabled = true;
+    const { items, bad } = parseImport($('importText').value);
+    if (!items.length) {
+      $('importPreview').textContent = 'Nothing valid found. Check the format.';
+      return;
+    }
+    const overwrite = $('overwriteToggle').checked;
+    const have = new Set(overwrite ? [] : state.videos.map(v => urlKey(v.url)));
+    const fresh = items.filter(v => !have.has(urlKey(v.url)));
+    pendingImport = { items: fresh, overwrite };
+    $('importPreview').textContent = overwrite
+      ? `Will replace your ${state.videos.length} videos with ${fresh.length}.${bad ? ` ${bad} invalid entries skipped.` : ''}`
+      : `${fresh.length} new, ${items.length - fresh.length} already saved.${bad ? ` ${bad} invalid entries skipped.` : ''}`;
+    $('runImportBtn').disabled = overwrite ? false : fresh.length === 0;
+  }
+
+  async function runImport() {
+    if (!pendingImport) return;
+    const { items, overwrite } = pendingImport;
+    if (overwrite && !await confirmMsg(`Replace your current ${state.videos.length} videos with ${items.length} from this import?`)) return;
+
+    const base = overwrite ? [] : state.videos;
+    const ids = new Set(base.map(v => v.id));
+    const add = items.slice(0, Math.max(0, CS_MAX - base.length)).map(v => {
+      if (ids.has(v.id)) v = { ...v, id: newId() };
+      ids.add(v.id);
+      return v;
+    });
+    const next = [...add, ...base];
+    const dropped = items.length - add.length;
+
+    $('runImportBtn').disabled = true;
+    try {
+      if (cloud) {
+        const jobs = add.map(v => () => cs('setItem', CS_PREFIX + v.id, JSON.stringify(v)));
+        if (overwrite) for (const v of state.videos) jobs.push(() => cs('removeItem', CS_PREFIX + v.id));
+        let done = 0;
+        setProgress(0);
+        for (let i = 0; i < jobs.length; i += 20) {
+          await Promise.all(jobs.slice(i, i + 20).map(j => j()));
+          done = Math.min(jobs.length, i + 20);
+          setProgress(done / jobs.length * 100);
+        }
+      }
+      mirror(next);
+      state.videos = next;
+      render(); refreshExport();
+      backupMsg(`Imported ${add.length} ${add.length === 1 ? 'video' : 'videos'}.${dropped ? ` ${dropped} skipped (1000 limit).` : ''}`, 'ok');
+      haptic('success');
+      $('importText').value = ''; $('importPreview').textContent = ''; pendingImport = null;
+    } catch (e) {
+      backupMsg('Import failed part-way. Reopen the app to see what was saved, then try again.', 'err');
+      haptic('error');
+    } finally {
+      setTimeout(() => setProgress(null), 600);
+    }
+  }
+
+  // ---------- Events ----------
+  document.addEventListener('click', e => {
+    const t = e.target.closest('[data-action],[data-tag],[data-tab]');
+    if (e.target.classList && e.target.classList.contains('modal')) { closeModal(); return; }
+    if (!t) return;
+    if (t.dataset.tab) { switchTab(t.dataset.tab); return; }
+    if (t.dataset.tag !== undefined) { haptic('tap'); toggleTag(t.dataset.tag); return; }
+    const v = state.videos.find(x => x.id === t.dataset.id);
+    if (!v) return;
+    if (t.dataset.action === 'open') { e.preventDefault(); haptic('tap'); openLink(v.url); }
+    else if (t.dataset.action === 'edit') openForm(v);
+    else if (t.dataset.action === 'delete') deleteVideo(v.id);
+  });
+
+  $('addBtn').addEventListener('click', () => openForm(null));
+  $('cancelBtn').addEventListener('click', closeModal);
+  $('saveBtn').addEventListener('click', saveForm);
+  $('newTags').addEventListener('keydown', e => { if (e.key === 'Enter') saveForm(); });
+  $('backupBtn').addEventListener('click', () => { showModal('backupModal'); switchTab('export'); });
+  $('backupClose').addEventListener('click', closeModal);
+  $('clearFilters').addEventListener('click', () => { state.tags = []; savePrefs(); render(); });
+  $('searchBox').addEventListener('input', e => { state.query = e.target.value; savePrefs(); render(); });
+  $('sortSel').addEventListener('change', e => { state.sort = e.target.value; savePrefs(); render(); });
+  document.querySelectorAll('input[name="expFmt"]').forEach(r => r.addEventListener('change', refreshExport));
+  $('copyExportBtn').addEventListener('click', copyExport);
+  $('downloadExportBtn').addEventListener('click', downloadExport);
+  $('previewImportBtn').addEventListener('click', previewImport);
+  $('runImportBtn').addEventListener('click', runImport);
+  $('importText').addEventListener('input', () => { pendingImport = null; $('runImportBtn').disabled = true; });
+  $('overwriteToggle').addEventListener('change', () => { if ($('importText').value.trim()) previewImport(); });
+  $('importFile').addEventListener('change', e => {
+    const f = e.target.files && e.target.files[0];
+    if (!f) return;
+    const r = new FileReader();
+    r.onload = () => { $('importText').value = String(r.result || ''); previewImport(); };
+    r.onerror = () => backupMsg('Could not read that file.', 'err');
+    r.readAsText(f);
+  });
+  document.addEventListener('keydown', e => { if (e.key === 'Escape') closeModal(); });
+  try { if (has('6.1')) tg.BackButton.onClick(closeModal); } catch {}
+
+  // ---------- Start ----------
+  async function init() {
+    readPrefs();
+    $('searchBox').value = state.query;
+    $('sortSel').value = state.sort;
+    render();
+    try { await load(); }
+    catch (e) { console.error(e); state.videos = readMirror(); state.mode = 'local'; }
+    state.loading = false;
+    render();
+  }
+  init();
+})();
+</script>
+</body>
+</html>
